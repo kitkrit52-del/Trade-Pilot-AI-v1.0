@@ -1,0 +1,9 @@
+python-telegram-bot==22.0
+python-binance
+pandas
+numpy
+ta
+ccxt
+python-dotenv
+requests
+openai
