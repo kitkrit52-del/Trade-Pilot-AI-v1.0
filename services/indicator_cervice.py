@@ -1,5 +1,5 @@
-import ccxt
-import pandas as pd
+ ccxt
+ pandas as pd
 import ta
 
 
