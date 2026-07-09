@@ -70,9 +70,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await query.answer()
 
-    symbol = query.data
-
-    data = get_signal(symbol, "1h")
+    BTCUSDT_1h
+    ETHUSDT_4h
+    SOLUSDT_15m
 
     message = (
         f"📊 Trade Pilot AI\n\n"
