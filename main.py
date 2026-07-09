@@ -1,7 +1,17 @@
 from flask import Flask
 from threading import Thread
-from telegram import Update
-from telegram.ext import Application, CommandHandler, ContextTypes
+from telegram import (
+    Update,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup
+)
+
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    ContextTypes,
+    CallbackQueryHandler
+)
 from services.indicator_service import get_signal
 import os
 
