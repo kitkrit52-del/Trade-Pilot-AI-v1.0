@@ -44,12 +44,12 @@ app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("status", status))
 
 print("🚀 Trade Pilot AI запущено")
-    app = Application.builder().token(BOT_TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
+app = Application.builder().token(BOT_TOKEN).build()
+app.add_handler(CommandHandler("start", start))
 
     print("🚀 Trade Pilot AI запущено")
 
-    app.run_polling(drop_pending_updates=True)
+app.run_polling(drop_pending_updates=True)
 
 if __name__ == "__main__":
     main()
