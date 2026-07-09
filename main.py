@@ -50,29 +50,27 @@ async def signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if len(context.args) >= 2:
             timeframe = context.args[1]
 
-        data.get('volume', 'N/A')
-        data.get('score', 'N/A')
-        data.get('support', 'N/A')
-        data.get('resistance', 'N/A')
+        # Отримуємо дані аналізу
+        data = get_signal(symbol, timeframe)
 
         message = (
-    f"📊 Trade Pilot AI\n\n"
-    f"Актив: {data['symbol']}\n"
-    f"Таймфрейм: {data['timeframe']}\n\n"
-    f"💰 Ціна: {data['price']} USDT\n"
-    f"📈 EMA20: {data['ema20']}\n"
-    f"📉 EMA50: {data['ema50']}\n"
-    f"⚡ RSI14: {data['rsi']}\n"
-    f"📊 ATR14: {data.get('atr', 'N/A')}\n"
-    f"🔥 Volume: {data['volume']}\n"
-    f"⭐ Сила сигналу: {data['score']}/4\n\n"
-    f"🟢 Сигнал: {data['signal']}\n\n"
-    f"🛑 Stop Loss: {data['sl']}\n"
-    f"🎯 TP1: {data['tp1']}\n"
-    f"🎯 TP2: {data['tp2']}\n\n"
-    f"📌 Support: {data['support']}\n"
-    f"📌 Resistance: {data['resistance']}"
-       )
+            f"📊 Trade Pilot AI\n\n"
+            f"Актив: {data['symbol']}\n"
+            f"Таймфрейм: {data['timeframe']}\n\n"
+            f"💰 Ціна: {data['price']} USDT\n"
+            f"📈 EMA20: {data['ema20']}\n"
+            f"📉 EMA50: {data['ema50']}\n"
+            f"⚡ RSI14: {data['rsi']}\n"
+            f"📊 ATR14: {data.get('atr', 'N/A')}\n"
+            f"🔥 Volume: {data.get('volume', 'N/A')}\n"
+            f"⭐ Сила сигналу: {data.get('score', 'N/A')}/4\n\n"
+            f"📌 Support: {data.get('support', 'N/A')}\n"
+            f"📌 Resistance: {data.get('resistance', 'N/A')}\n\n"
+            f"📍 Сигнал: {data['signal']}\n\n"
+            f"🛑 Stop Loss: {data['sl']}\n"
+            f"🎯 TP1: {data['tp1']}\n"
+            f"🎯 TP2: {data['tp2']}"
+        )
 
         await update.message.reply_text(message)
 
