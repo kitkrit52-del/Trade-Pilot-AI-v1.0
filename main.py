@@ -60,7 +60,7 @@ async def signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
     f"📈 EMA20: {data['ema20']}\n"
     f"📉 EMA50: {data['ema50']}\n"
     f"⚡ RSI14: {data['rsi']}\n"
-    f"📊 ATR14: {data['atr']}\n"
+    f"📊 ATR14: {data.get('atr', 'N/A')}\n"
     f"🔥 Volume: {data['volume']}\n"
     f"⭐ Сила сигналу: {data['score']}/4\n\n"
     f"🟢 Сигнал: {data['signal']}\n\n"
