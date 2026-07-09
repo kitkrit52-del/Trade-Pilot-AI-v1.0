@@ -65,7 +65,35 @@ async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "📊 Оберіть актив:",
         reply_markup=reply_markup
     )
+async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
 
+    await query.answer()
+
+    symbol = query.data
+
+    data = get_signal(symbol, "1h")
+
+    message = (
+        f"📊 Trade Pilot AI\n\n"
+        f"Актив: {data['symbol']}\n"
+        f"Таймфрейм: {data['timeframe']}\n\n"
+        f"💰 Ціна: {data['price']} USDT\n"
+        f"📈 EMA20: {data['ema20']}\n"
+        f"📉 EMA50: {data['ema50']}\n"
+        f"⚡ RSI14: {data['rsi']}\n"
+        f"📊 ATR14: {data['atr']}\n"
+        f"🔥 Volume: {data['volume']}\n"
+        f"⭐ Сила сигналу: {data['score']}/4\n\n"
+        f"📌 Support: {data['support']}\n"
+        f"📌 Resistance: {data['resistance']}\n\n"
+        f"📍 Сигнал: {data['signal']}\n\n"
+        f"🛑 Stop Loss: {data['sl']}\n"
+        f"🎯 TP1: {data['tp1']}\n"
+        f"🎯 TP2: {data['tp2']}"
+    )
+
+    await query.edit_message_text(message)
 async def signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         symbol = "BTCUSDT"
