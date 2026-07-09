@@ -1,19 +1,21 @@
- ccxt
- pandas as pd
+import ccxt
+import pandas as pd
 import ta
 
 
-def get_market_data(symbol="BTC/USDT", timeframe="1h", limit=100):
+def get_signal(symbol="BTCUSDT", timeframe="1h"):
     exchange = ccxt.binance()
 
-    ohlcv = exchange.fetch_ohlcv(
-        symbol=symbol,
+    pair = symbol.replace("USDT", "/USDT")
+
+    candles = exchange.fetch_ohlcv(
+        pair,
         timeframe=timeframe,
-        limit=limit
+        limit=100
     )
 
     df = pd.DataFrame(
-        ohlcv,
+        candles,
         columns=[
             "timestamp",
             "open",
@@ -24,15 +26,6 @@ def get_market_data(symbol="BTC/USDT", timeframe="1h", limit=100):
         ]
     )
 
-    df["timestamp"] = pd.to_datetime(
-        df["timestamp"],
-        unit="ms"
-    )
-
-    return df
-
-
-def calculate_indicators(df):
     df["EMA20"] = ta.trend.ema_indicator(
         df["close"],
         window=20
@@ -48,23 +41,29 @@ def calculate_indicators(df):
         window=14
     )
 
-    return df
-
-
-def analyze_market(symbol="BTC/USDT", timeframe="1h"):
-    df = get_market_data(symbol, timeframe)
-    df = calculate_indicators(df)
-
     last = df.iloc[-1]
 
-    trend = "LONG ✅" if last["EMA20"] > last["EMA50"] else "SHORT ❌"
+    price = float(last["close"])
+    ema20 = float(last["EMA20"])
+    ema50 = float(last["EMA50"])
+    rsi = float(last["RSI"])
+
+    if ema20 > ema50 and rsi > 55:
+        signal = "🟢 LONG"
+    elif ema20 < ema50 and rsi < 45:
+        signal = "🔴 SHORT"
+    else:
+        signal = "⚪ SKIP"
 
     return {
         "symbol": symbol,
         "timeframe": timeframe,
-        "price": round(last["close"], 2),
-        "ema20": round(last["EMA20"], 2),
-        "ema50": round(last["EMA50"], 2),
-        "rsi": round(last["RSI"], 2),
-        "signal": trend
+        "price": round(price, 2),
+        "ema20": round(ema20, 2),
+        "ema50": round(ema50, 2),
+        "rsi": round(rsi, 2),
+        "signal": signal,
+        "sl": round(price * 0.99, 2),
+        "tp1": round(price * 1.02, 2),
+        "tp2": round(price * 1.04, 2),
     }
