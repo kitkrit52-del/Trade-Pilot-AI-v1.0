@@ -67,12 +67,57 @@ async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-
     await query.answer()
 
-    BTCUSDT_1h
-    ETHUSDT_4h
-    SOLUSDT_15m
+    data = query.data
+
+    # Крок 1 — вибір активу
+    if data in ["BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT"]:
+
+        keyboard = [
+            [
+                InlineKeyboardButton("15m", callback_data=f"{data}|15m"),
+                InlineKeyboardButton("1h", callback_data=f"{data}|1h")
+            ],
+            [
+                InlineKeyboardButton("4h", callback_data=f"{data}|4h"),
+                InlineKeyboardButton("1D", callback_data=f"{data}|1d")
+            ]
+        ]
+
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
+        await query.edit_message_text(
+            f"⏰ Оберіть таймфрейм для {data}:",
+            reply_markup=reply_markup
+        )
+        return
+
+    # Крок 2 — аналіз після вибору таймфрейму
+    symbol, timeframe = data.split("|")
+
+    signal_data = get_signal(symbol, timeframe)
+
+    message = (
+        f"📊 Trade Pilot AI\n\n"
+        f"Актив: {signal_data['symbol']}\n"
+        f"Таймфрейм: {signal_data['timeframe']}\n\n"
+        f"💰 Ціна: {signal_data['price']} USDT\n"
+        f"📈 EMA20: {signal_data['ema20']}\n"
+        f"📉 EMA50: {signal_data['ema50']}\n"
+        f"⚡ RSI14: {signal_data['rsi']}\n"
+        f"📊 ATR14: {signal_data['atr']}\n"
+        f"🔥 Volume: {signal_data['volume']}\n"
+        f"⭐ Сила сигналу: {signal_data['score']}/4\n\n"
+        f"📌 Support: {signal_data['support']}\n"
+        f"📌 Resistance: {signal_data['resistance']}\n\n"
+        f"📍 Сигнал: {signal_data['signal']}\n\n"
+        f"🛑 Stop Loss: {signal_data['sl']}\n"
+        f"🎯 TP1: {signal_data['tp1']}\n"
+        f"🎯 TP2: {signal_data['tp2']}"
+    )
+
+    await query.edit_message_text(message)
 
     message = (
         f"📊 Trade Pilot AI\n\n"
