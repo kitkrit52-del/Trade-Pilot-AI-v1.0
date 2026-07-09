@@ -53,18 +53,23 @@ async def signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
         data = get_signal(symbol, timeframe)
 
         message = (
-            f"📊 Trade Pilot AI\n\n"
-            f"Актив: {data['symbol']}\n"
-            f"Таймфрейм: {data['timeframe']}\n\n"
-            f"💰 Ціна: {data['price']} USDT\n"
-            f"📈 EMA20: {data['ema20']}\n"
-            f"📉 EMA50: {data['ema50']}\n"
-            f"⚡ RSI14: {data['rsi']}\n\n"
-            f"Сигнал: {data['signal']}\n\n"
-            f"🛑 Stop Loss: {data['sl']}\n"
-            f"🎯 TP1: {data['tp1']}\n"
-            f"🎯 TP2: {data['tp2']}"
-        )
+    f"📊 Trade Pilot AI\n\n"
+    f"Актив: {data['symbol']}\n"
+    f"Таймфрейм: {data['timeframe']}\n\n"
+    f"💰 Ціна: {data['price']} USDT\n"
+    f"📈 EMA20: {data['ema20']}\n"
+    f"📉 EMA50: {data['ema50']}\n"
+    f"⚡ RSI14: {data['rsi']}\n"
+    f"📊 ATR14: {data['atr']}\n"
+    f"🔥 Volume: {data['volume']}\n"
+    f"⭐ Сила сигналу: {data['score']}/4\n\n"
+    f"🟢 Сигнал: {data['signal']}\n\n"
+    f"🛑 Stop Loss: {data['sl']}\n"
+    f"🎯 TP1: {data['tp1']}\n"
+    f"🎯 TP2: {data['tp2']}\n\n"
+    f"📌 Support: {data['support']}\n"
+    f"📌 Resistance: {data['resistance']}"
+       )
 
         await update.message.reply_text(message)
 
