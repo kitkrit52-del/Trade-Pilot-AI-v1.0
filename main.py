@@ -2,6 +2,7 @@ from flask import Flask
 from threading import Thread
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
+from services.indicator_service import get_signal
 import os
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -20,19 +21,57 @@ def run_web():
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "✅ Це Python-бот Trade Pilot AI.\n"
-        "Версія: 1.0\n"
-        "Хостинг: Zeabur"
+        "🚀 Trade Pilot AI v1.1\n\n"
+        "Доступні команди:\n"
+        "/start\n"
+        "/status\n"
+        "/signal BTCUSDT 1h\n"
+        "/signal ETHUSDT 15m"
     )
 
 
 async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "🟢 Trade Pilot AI працює\n"
-        "Версія: 1.0\n"
+        "Версія: 1.1\n"
         "Хостинг: Zeabur\n"
         "Статус: ONLINE"
     )
+
+
+async def signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        symbol = "BTCUSDT"
+        timeframe = "1h"
+
+        if len(context.args) >= 1:
+            symbol = context.args[0].upper()
+
+        if len(context.args) >= 2:
+            timeframe = context.args[1]
+
+        data = get_signal(symbol, timeframe)
+
+        message = (
+            f"📊 Trade Pilot AI\n\n"
+            f"Актив: {data['symbol']}\n"
+            f"Таймфрейм: {data['timeframe']}\n\n"
+            f"💰 Ціна: {data['price']} USDT\n"
+            f"📈 EMA20: {data['ema20']}\n"
+            f"📉 EMA50: {data['ema50']}\n"
+            f"⚡ RSI14: {data['rsi']}\n\n"
+            f"Сигнал: {data['signal']}\n\n"
+            f"🛑 Stop Loss: {data['sl']}\n"
+            f"🎯 TP1: {data['tp1']}\n"
+            f"🎯 TP2: {data['tp2']}"
+        )
+
+        await update.message.reply_text(message)
+
+    except Exception as e:
+        await update.message.reply_text(
+            f"❌ Помилка аналізу:\n{str(e)}"
+        )
 
 
 def main():
@@ -42,8 +81,9 @@ def main():
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("status", status))
+    app.add_handler(CommandHandler("signal", signal))
 
-    print("🚀 Trade Pilot AI запущено")
+    print("🚀 Trade Pilot AI v1.1 запущено")
 
     app.run_polling(drop_pending_updates=True)
 
