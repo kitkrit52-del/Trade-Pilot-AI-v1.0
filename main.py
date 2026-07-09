@@ -47,7 +47,24 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Хостинг: Zeabur\n"
         "Статус: ONLINE"
     )
+async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [
+            InlineKeyboardButton("₿ BTC", callback_data="BTCUSDT"),
+            InlineKeyboardButton("Ξ ETH", callback_data="ETHUSDT")
+        ],
+        [
+            InlineKeyboardButton("◎ SOL", callback_data="SOLUSDT"),
+            InlineKeyboardButton("✕ XRP", callback_data="XRPUSDT")
+        ]
+    ]
 
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await update.message.reply_text(
+        "📊 Оберіть актив:",
+        reply_markup=reply_markup
+    )
 
 async def signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
