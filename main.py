@@ -50,7 +50,10 @@ async def signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if len(context.args) >= 2:
             timeframe = context.args[1]
 
-        data = get_signal(symbol, timeframe)
+        data.get('volume', 'N/A')
+        data.get('score', 'N/A')
+        data.get('support', 'N/A')
+        data.get('resistance', 'N/A')
 
         message = (
     f"📊 Trade Pilot AI\n\n"
