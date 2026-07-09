@@ -22,10 +22,28 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Версія: 1.0\n"
         "Хостинг: Zeabur"
     )
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "✅ Це Python-бот Trade Pilot AI.\n"
+        "Версія: 1.0\n"
+        "Хостинг: Zeabur"
+    )
 
+async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "🟢 Trade Pilot AI працює\n"
+        "Версія: 1.0\n"
+        "Хостинг: Zeabur\n"
+        "Статус: ONLINE"
+    )
 def main():
     Thread(target=run_web, daemon=True).start()
+app = Application.builder().token(BOT_TOKEN).build()
 
+app.add_handler(CommandHandler("start", start))
+app.add_handler(CommandHandler("status", status))
+
+print("🚀 Trade Pilot AI запущено")
     app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
 
