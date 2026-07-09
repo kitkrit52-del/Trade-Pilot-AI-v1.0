@@ -12,9 +12,11 @@ web = Flask(__name__)
 def health():
     return "Trade Pilot AI is running", 200
 
+
 def run_web():
     port = int(os.environ.get("PORT", 8080))
     web.run(host="0.0.0.0", port=port)
+
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
@@ -22,12 +24,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Версія: 1.0\n"
         "Хостинг: Zeabur"
     )
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "✅ Це Python-бот Trade Pilot AI.\n"
-        "Версія: 1.0\n"
-        "Хостинг: Zeabur"
-    )
+
 
 async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
@@ -36,20 +33,20 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Хостинг: Zeabur\n"
         "Статус: ONLINE"
     )
+
+
 def main():
     Thread(target=run_web, daemon=True).start()
-app = Application.builder().token(BOT_TOKEN).build()
 
-app.add_handler(CommandHandler("start", start))
-app.add_handler(CommandHandler("status", status))
+    app = Application.builder().token(BOT_TOKEN).build()
 
-print("🚀 Trade Pilot AI запущено")
-app = Application.builder().token(BOT_TOKEN).build()
-app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("status", status))
 
     print("🚀 Trade Pilot AI запущено")
 
-app.run_polling(drop_pending_updates=True)
+    app.run_polling(drop_pending_updates=True)
+
 
 if __name__ == "__main__":
     main()
