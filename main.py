@@ -142,7 +142,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
     async def signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    try:
+        try:
         symbol = "BTCUSDT"
         timeframe = "1h"
 
