@@ -138,7 +138,6 @@ if price > support:
         "tp2": tp2
     }
 
-
 def get_mtf_signal(symbol="BTCUSDT"):
     timeframes = ["15m", "1h", "4h"]
 
@@ -153,3 +152,4 @@ def get_mtf_signal(symbol="BTCUSDT"):
         }
 
     return results
+
