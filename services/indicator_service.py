@@ -40,75 +40,76 @@ def get_signal(symbol="BTCUSDT", timeframe="1h"):
     )
 
     # RSI
-df["RSI"] = ta.momentum.rsi(
-    df["close"],
-    window=14
-)
+    df["RSI"] = ta.momentum.rsi(
+        df["close"],
+        window=14
+    )
 
-# MACD
-macd = ta.trend.MACD(df["close"])
+    # MACD
+    macd = ta.trend.MACD(df["close"])
 
-df["MACD"] = macd.macd()
-df["MACD_SIGNAL"] = macd.macd_signal()
+    df["MACD"] = macd.macd()
+    df["MACD_SIGNAL"] = macd.macd_signal()
 
-# ATR
-atr_indicator = ta.volatility.AverageTrueRange(
-    high=df["high"],
-    low=df["low"],
-    close=df["close"],
-    window=14
-)
+    # ATR
+    atr_indicator = ta.volatility.AverageTrueRange(
+        high=df["high"],
+        low=df["low"],
+        close=df["close"],
+        window=14
+    )
 
-df["ATR"] = atr_indicator.average_true_range()
+    df["ATR"] = atr_indicator.average_true_range()
 
-last = df.iloc[-1]
+    last = df.iloc[-1]
 
-price = round(float(last["close"]), 2)
-ema20 = round(float(last["EMA20"]), 2)
-ema50 = round(float(last["EMA50"]), 2)
-rsi = round(float(last["RSI"]), 2)
-macd_value = round(float(last["MACD"]), 2)
-macd_signal = round(float(last["MACD_SIGNAL"]), 2)
-atr = round(float(last["ATR"]), 2)
+    price = round(float(last["close"]), 2)
+    ema20 = round(float(last["EMA20"]), 2)
+    ema50 = round(float(last["EMA50"]), 2)
+    rsi = round(float(last["RSI"]), 2)
+    macd_value = round(float(last["MACD"]), 2)
+    macd_signal = round(float(last["MACD_SIGNAL"]), 2)
+    atr = round(float(last["ATR"]), 2)
 
-# Volume analysis
-avg_volume = df["volume"].tail(20).mean()
-current_volume = float(last["volume"])
+    # Volume analysis
+    avg_volume = df["volume"].tail(20).mean()
+    current_volume = float(last["volume"])
 
-if current_volume > avg_volume * 1.5:
-    volume = "HIGH 🔥"
-else:
-    volume = "NORMAL"
+    if current_volume > avg_volume * 1.5:
+        volume = "HIGH 🔥"
+    else:
+        volume = "NORMAL"
 
-# Support / Resistance
-support = round(float(df["low"].tail(20).min()), 2)
-resistance = round(float(df["high"].tail(20).max()), 2)
+    # Support / Resistance
+    support = round(float(df["low"].tail(20).min()), 2)
+    resistance = round(float(df["high"].tail(20).max()), 2)
 
-# Signal strength
-score = 0
+    # Signal strength
+    score = 0
 
-if ema20 > ema50:
-    score += 1
+    if ema20 > ema50:
+        score += 1
 
-if rsi > 55:
-    score += 1
+    if rsi > 55:
+        score += 1
 
-if macd_value > macd_signal:
-    score += 1
+    if macd_value > macd_signal:
+        score += 1
 
-if current_volume > avg_volume * 1.5:
-    score += 1
+    if current_volume > avg_volume * 1.5:
+        score += 1
 
-if price > support:
-    score += 1
+    if price > support:
+        score += 1
+
     # Trading signal
-    if ema20 > ema50 and rsi > 55:
+    if ema20 > ema50 and rsi > 55 and macd_value > macd_signal:
         signal = "🟢 LONG"
         sl = round(price - atr * 1.5, 2)
         tp1 = round(price + atr * 2, 2)
         tp2 = round(price + atr * 4, 2)
 
-    elif ema20 < ema50 and rsi < 45:
+    elif ema20 < ema50 and rsi < 45 and macd_value < macd_signal:
         signal = "🔴 SHORT"
         sl = round(price + atr * 1.5, 2)
         tp1 = round(price - atr * 2, 2)
@@ -127,6 +128,8 @@ if price > support:
         "ema20": ema20,
         "ema50": ema50,
         "rsi": rsi,
+        "macd": macd_value,
+        "macd_signal": macd_signal,
         "atr": atr,
         "volume": volume,
         "score": score,
@@ -137,6 +140,7 @@ if price > support:
         "tp1": tp1,
         "tp2": tp2
     }
+
 
 def get_mtf_signal(symbol="BTCUSDT"):
     timeframes = ["15m", "1h", "4h"]
