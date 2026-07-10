@@ -141,40 +141,44 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.edit_message_text(message)
 
 
-    async def signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        try:
-           symbol = "BTCUSDT"
-           timeframe = "1h"
+async def signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        symbol = "BTCUSDT"
+        timeframe = "1h"
 
-           if len(context.args) >= 1:
+        if len(context.args) >= 1:
             symbol = context.args[0].upper()
 
-           if len(context.args) >= 2:
-               timeframe = context.args[1]
+        if len(context.args) >= 2:
+            timeframe = context.args[1]
 
-            data = get_signal(symbol, timeframe)
-            if data["macd"] > data["macd_signal"]:
-                macd_status = "🟢 Bullish Cross"
-            else:
-                macd_status = "🔴 Bearish Cross"
-            
-            message = (
-                f"📊 Trade Pilot AI\n\n"
-                f"Актив: {data['symbol']}\n"
-                f"Таймфрейм: {data['timeframe']}\n\n"
-                f"💰 Ціна: {data['price']} USDT\n"
-                f"📈 EMA20: {data['ema20']}\n"
-                f"📉 EMA50: {data['ema50']}\n"
-                f"⚡ RSI14: {data['rsi']}\n"
-                f"📊 ATR14: {data['atr']}\n"
-                f"🔥 Volume: {data['volume']}\n"
-                f"⭐ Сила сигналу: {data['score']}/4\n\n"
-                f"📌 Support: {data['support']}\n"
-                f"📌 Resistance: {data['resistance']}\n\n"
-                f"📍 Сигнал: {data['signal']}\n\n"
-                f"🛑 Stop Loss: {data['sl']}\n"
-                f"🎯 TP1: {data['tp1']}\n"
-                f"🎯 TP2: {data['tp2']}"
+        data = get_signal(symbol, timeframe)
+
+        if data["macd"] > data["macd_signal"]:
+            macd_status = "🟢 Bullish Cross"
+        else:
+            macd_status = "🔴 Bearish Cross"
+
+        message = (
+            f"📊 Trade Pilot AI\n\n"
+            f"Актив: {data['symbol']}\n"
+            f"Таймфрейм: {data['timeframe']}\n\n"
+            f"💰 Ціна: {data['price']} USDT\n"
+            f"📈 EMA20: {data['ema20']}\n"
+            f"📉 EMA50: {data['ema50']}\n"
+            f"⚡ RSI14: {data['rsi']}\n"
+            f"📉 MACD: {data['macd']}\n"
+            f"📈 MACD Signal: {data['macd_signal']}\n"
+            f"🔔 MACD Status: {macd_status}\n"
+            f"📊 ATR14: {data['atr']}\n"
+            f"🔥 Volume: {data['volume']}\n"
+            f"⭐ Сила сигналу: {data['score']}/5\n\n"
+            f"📌 Support: {data['support']}\n"
+            f"📌 Resistance: {data['resistance']}\n\n"
+            f"📍 Сигнал: {data['signal']}\n\n"
+            f"🛑 Stop Loss: {data['sl']}\n"
+            f"🎯 TP1: {data['tp1']}\n"
+            f"🎯 TP2: {data['tp2']}"
         )
 
         await update.message.reply_text(message)
