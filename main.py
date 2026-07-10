@@ -200,30 +200,16 @@ async def mtf(update: Update, context: ContextTypes.DEFAULT_TYPE):
             agreement += 1
 
     message = (
-        f"📊 Trade Pilot AI MTF\n\n"
-        f"{symbol}\n\n"
-        f"15m → {result['15m']['signal']} "
-        f"⭐{result['15m']['score']}/4\n"
-        f"1h → {result['1h']['signal']} "
-        f"⭐{result['1h']['score']}/4\n"
-        f"4h → {result['4h']['signal']} "
-        f"⭐{result['4h']['score']}/4\n\n"
-        f"━━━━━━━━━━━━━━━\n"
-       if agreement == 3:
-    confidence = "🔥 HIGH"
-    recommendation = "✅ LONG дозволений"
-elif agreement == 2:
-    confidence = "⚡ MEDIUM"
-    recommendation = "⚠️ Вхід можливий з підтвердженням"
-elif agreement == 1:
-    confidence = "⚠️ LOW"
-    recommendation = "⏳ Краще зачекати"
-else:
-    confidence = "❌ NONE"
-    recommendation = "🚫 Торгівля не рекомендується"
-    )
-
-    await update.message.reply_text(message)
+    f"📊 Trade Pilot AI MTF\n\n"
+    f"{symbol}\n\n"
+    f"15m → {result['15m']['signal']} ⭐{result['15m']['score']}/4\n"
+    f"1h → {result['1h']['signal']} ⭐{result['1h']['score']}/4\n"
+    f"4h → {result['4h']['signal']} ⭐{result['4h']['score']}/4\n\n"
+    f"━━━━━━━━━━━━━━━\n"
+    f"📈 Узгодження: {agreement}/3\n"
+    f"🎯 Confidence: {confidence}\n\n"
+    f"{recommendation}"
+)
 def main():
     Thread(target=run_web, daemon=True).start()
 
