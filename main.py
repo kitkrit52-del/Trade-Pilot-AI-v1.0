@@ -47,6 +47,8 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Хостинг: Zeabur\n"
         "Статус: ONLINE"
     )
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+
 async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [
@@ -61,6 +63,10 @@ async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
+    await update.message.reply_text(
+        "📊 Оберіть актив:",
+        reply_markup=reply_markup
+    )
     await update.message.reply_text(
         "📊 Оберіть актив:",
         reply_markup=reply_markup
