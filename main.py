@@ -115,6 +115,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     symbol, timeframe = data.split("|")
 
     signal_data = get_signal(symbol, timeframe)
+    
 
     message = (
         f"📊 Trade Pilot AI\n\n"
@@ -140,7 +141,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.edit_message_text(message)
 
 
-async def signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         symbol = "BTCUSDT"
         timeframe = "1h"
@@ -152,8 +153,12 @@ async def signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
             timeframe = context.args[1]
 
         data = get_signal(symbol, timeframe)
-
-        message = (
+        if data["macd"] > data["macd_signal"]:
+            macd_status = "🟢 Bullish Cross"
+        else:
+            macd_status = "🔴 Bearish Cross"
+            
+         message = (
             f"📊 Trade Pilot AI\n\n"
             f"Актив: {data['symbol']}\n"
             f"Таймфрейм: {data['timeframe']}\n\n"
