@@ -199,7 +199,29 @@ async def mtf(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if result[tf]["signal"] == "🟢 LONG":
             agreement += 1
 
-    message = (
+    agreement = 0
+
+for tf in result:
+    if result[tf]["signal"] == "🟢 LONG":
+        agreement += 1
+
+if agreement == 3:
+    confidence = "🔥 HIGH"
+    recommendation = "✅ LONG дозволений"
+
+elif agreement == 2:
+    confidence = "⚡ MEDIUM"
+    recommendation = "⚠️ Вхід можливий з підтвердженням"
+
+elif agreement == 1:
+    confidence = "⚠️ LOW"
+    recommendation = "⏳ Краще зачекати"
+
+else:
+    confidence = "❌ NONE"
+    recommendation = "🚫 Торгівля не рекомендується"
+
+message = (
     f"📊 Trade Pilot AI MTF\n\n"
     f"{symbol}\n\n"
     f"15m → {result['15m']['signal']} ⭐{result['15m']['score']}/4\n"
@@ -210,6 +232,8 @@ async def mtf(update: Update, context: ContextTypes.DEFAULT_TYPE):
     f"🎯 Confidence: {confidence}\n\n"
     f"{recommendation}"
 )
+
+await update.message.reply_text(message)
 def main():
     Thread(target=run_web, daemon=True).start()
 
