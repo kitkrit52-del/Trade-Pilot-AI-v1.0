@@ -216,7 +216,7 @@ def main():
     app.add_handler(CommandHandler("status", status))
     app.add_handler(CommandHandler("signal", signal))
     app.add_handler(CommandHandler("menu", menu))
-
+    app.add_handler(CommandHandler("mtf", mtf))
     app.add_handler(CallbackQueryHandler(button))
 
     print("🚀 Trade Pilot AI v1.1 запущено")
