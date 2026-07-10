@@ -40,66 +40,67 @@ def get_signal(symbol="BTCUSDT", timeframe="1h"):
     )
 
     # RSI
-    df["RSI"] = ta.momentum.rsi(
+df["RSI"] = ta.momentum.rsi(
     df["close"],
     window=14
 )
 
-     # MACD
-     macd = ta.trend.MACD(df["close"])
+# MACD
+macd = ta.trend.MACD(df["close"])
 
-    df["MACD"] = macd.macd()
-    df["MACD_SIGNAL"] = macd.macd_signal()
+df["MACD"] = macd.macd()
+df["MACD_SIGNAL"] = macd.macd_signal()
 
-    # ATR
-    atr_indicator = ta.volatility.AverageTrueRange(
+# ATR
+atr_indicator = ta.volatility.AverageTrueRange(
     high=df["high"],
     low=df["low"],
     close=df["close"],
     window=14
 )
 
-    df["ATR"] = atr_indicator.average_true_range()
+df["ATR"] = atr_indicator.average_true_range()
 
-    last = df.iloc[-1]
+last = df.iloc[-1]
 
-    price = round(float(last["close"]), 2)
-    ema20 = round(float(last["EMA20"]), 2)
-    ema50 = round(float(last["EMA50"]), 2)
-    rsi = round(float(last["RSI"]), 2)
-    macd_value = round(float(last["MACD"]), 2)
-    macd_signal = round(float(last["MACD_SIGNAL"]), 2)
-    atr = round(float(last["ATR"]), 2)
+price = round(float(last["close"]), 2)
+ema20 = round(float(last["EMA20"]), 2)
+ema50 = round(float(last["EMA50"]), 2)
+rsi = round(float(last["RSI"]), 2)
+macd_value = round(float(last["MACD"]), 2)
+macd_signal = round(float(last["MACD_SIGNAL"]), 2)
+atr = round(float(last["ATR"]), 2)
 
-    # Volume analysis
-    avg_volume = df["volume"].tail(20).mean()
-    current_volume = float(last["volume"])
-    if macd_value > macd_signal:
+# Volume analysis
+avg_volume = df["volume"].tail(20).mean()
+current_volume = float(last["volume"])
+
+if current_volume > avg_volume * 1.5:
+    volume = "HIGH 🔥"
+else:
+    volume = "NORMAL"
+
+# Support / Resistance
+support = round(float(df["low"].tail(20).min()), 2)
+resistance = round(float(df["high"].tail(20).max()), 2)
+
+# Signal strength
+score = 0
+
+if ema20 > ema50:
     score += 1
-    if current_volume > avg_volume * 1.5:
-        volume = "HIGH 🔥"
-    else:
-        volume = "NORMAL"
 
-    # Support / Resistance
-    support = round(float(df["low"].tail(20).min()), 2)
-    resistance = round(float(df["high"].tail(20).max()), 2)
+if rsi > 55:
+    score += 1
 
-    # Signal strength
-    score = 0
+if macd_value > macd_signal:
+    score += 1
 
-    if ema20 > ema50:
-        score += 1
+if current_volume > avg_volume * 1.5:
+    score += 1
 
-    if rsi > 55:
-        score += 1
-
-    if current_volume > avg_volume * 1.5:
-        score += 1
-
-    if price > support:
-        score += 1
-
+if price > support:
+    score += 1
     # Trading signal
     if ema20 > ema50 and rsi > 55:
         signal = "🟢 LONG"
