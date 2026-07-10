@@ -71,7 +71,8 @@ df["MACD_SIGNAL"] = macd.macd_signal()
     # Volume analysis
     avg_volume = df["volume"].tail(20).mean()
     current_volume = float(last["volume"])
-
+    if macd_value > macd_signal:
+    score += 1
     if current_volume > avg_volume * 1.5:
         volume = "HIGH 🔥"
     else:
