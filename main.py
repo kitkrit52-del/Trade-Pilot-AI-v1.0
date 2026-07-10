@@ -12,7 +12,7 @@ from telegram.ext import (
     ContextTypes,
     CallbackQueryHandler
 )
-from services.indicator_service import get_signal
+from services.indicator_service import get_signal, get_mtf_signal
 import os
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
