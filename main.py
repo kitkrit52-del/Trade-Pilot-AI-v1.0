@@ -204,19 +204,16 @@ async def mtf(update: Update, context: ContextTypes.DEFAULT_TYPE):
 for tf in result:
     if result[tf]["signal"] == "🟢 LONG":
         agreement += 1
-
+        
 if agreement == 3:
     confidence = "🔥 HIGH"
     recommendation = "✅ LONG дозволений"
-
 elif agreement == 2:
     confidence = "⚡ MEDIUM"
     recommendation = "⚠️ Вхід можливий з підтвердженням"
-
 elif agreement == 1:
     confidence = "⚠️ LOW"
     recommendation = "⏳ Краще зачекати"
-
 else:
     confidence = "❌ NONE"
     recommendation = "🚫 Торгівля не рекомендується"
