@@ -12,10 +12,19 @@ from telegram.ext import (
     ContextTypes,
     CallbackQueryHandler
 )
-from services.indicator_service import get_signal, get_mtf_signal
+
+from services.indicator_service import (
+    get_signal,
+    get_mtf_signal
+)
+
 import os
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
+
+# -------------------------
+# Flask Health Check
+# -------------------------
 
 web = Flask(__name__)
 
@@ -29,14 +38,19 @@ def run_web():
     web.run(host="0.0.0.0", port=port)
 
 
+# -------------------------
+# Commands
+# -------------------------
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "🚀 Trade Pilot AI v1.1\n\n"
-        "Доступні команди:\n"
+        "Доступні команди:\n\n"
         "/start\n"
         "/status\n"
+        "/menu\n"
         "/signal BTCUSDT 1h\n"
-        "/signal ETHUSDT 15m"
+        "/mtf BTCUSDT"
     )
 
 
@@ -47,7 +61,7 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Хостинг: Zeabur\n"
         "Статус: ONLINE"
     )
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+
 
 async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
@@ -67,17 +81,15 @@ async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "📊 Оберіть актив:",
         reply_markup=reply_markup
     )
-    await update.message.reply_text(
-        "📊 Оберіть актив:",
-        reply_markup=reply_markup
-    )
+
+
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
     data = query.data
 
-    # Крок 1 — вибір активу
+    # Вибір активу
     if data in ["BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT"]:
 
         keyboard = [
@@ -87,7 +99,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ],
             [
                 InlineKeyboardButton("4h", callback_data=f"{data}|4h"),
-                InlineKeyboardButton("1D", callback_data=f"{data}|1d")
+                InlineKeyboardButton("1d", callback_data=f"{data}|1d")
             ]
         ]
 
@@ -99,7 +111,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # Крок 2 — аналіз після вибору таймфрейму
+    # Аналіз після вибору таймфрейму
     symbol, timeframe = data.split("|")
 
     signal_data = get_signal(symbol, timeframe)
@@ -125,26 +137,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await query.edit_message_text(message)
 
-    message = (
-        f"📊 Trade Pilot AI\n\n"
-        f"Актив: {data['symbol']}\n"
-        f"Таймфрейм: {data['timeframe']}\n\n"
-        f"💰 Ціна: {data['price']} USDT\n"
-        f"📈 EMA20: {data['ema20']}\n"
-        f"📉 EMA50: {data['ema50']}\n"
-        f"⚡ RSI14: {data['rsi']}\n"
-        f"📊 ATR14: {data['atr']}\n"
-        f"🔥 Volume: {data['volume']}\n"
-        f"⭐ Сила сигналу: {data['score']}/4\n\n"
-        f"📌 Support: {data['support']}\n"
-        f"📌 Resistance: {data['resistance']}\n\n"
-        f"📍 Сигнал: {data['signal']}\n\n"
-        f"🛑 Stop Loss: {data['sl']}\n"
-        f"🎯 TP1: {data['tp1']}\n"
-        f"🎯 TP2: {data['tp2']}"
-    )
 
-    await query.edit_message_text(message)
 async def signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         symbol = "BTCUSDT"
@@ -156,7 +149,6 @@ async def signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if len(context.args) >= 2:
             timeframe = context.args[1]
 
-        # Отримуємо дані аналізу
         data = get_signal(symbol, timeframe)
 
         message = (
@@ -167,11 +159,11 @@ async def signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"📈 EMA20: {data['ema20']}\n"
             f"📉 EMA50: {data['ema50']}\n"
             f"⚡ RSI14: {data['rsi']}\n"
-            f"📊 ATR14: {data.get('atr', 'N/A')}\n"
-            f"🔥 Volume: {data.get('volume', 'N/A')}\n"
-            f"⭐ Сила сигналу: {data.get('score', 'N/A')}/4\n\n"
-            f"📌 Support: {data.get('support', 'N/A')}\n"
-            f"📌 Resistance: {data.get('resistance', 'N/A')}\n\n"
+            f"📊 ATR14: {data['atr']}\n"
+            f"🔥 Volume: {data['volume']}\n"
+            f"⭐ Сила сигналу: {data['score']}/4\n\n"
+            f"📌 Support: {data['support']}\n"
+            f"📌 Resistance: {data['resistance']}\n\n"
             f"📍 Сигнал: {data['signal']}\n\n"
             f"🛑 Stop Loss: {data['sl']}\n"
             f"🎯 TP1: {data['tp1']}\n"
@@ -184,6 +176,7 @@ async def signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(
             f"❌ Помилка аналізу:\n{str(e)}"
         )
+
 
 async def mtf(update: Update, context: ContextTypes.DEFAULT_TYPE):
     symbol = "BTCUSDT"
@@ -199,38 +192,37 @@ async def mtf(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if result[tf]["signal"] == "🟢 LONG":
             agreement += 1
 
-    agreement = 0
-
-    for tf in result:
-    if result[tf]["signal"] == "🟢 LONG":
-        agreement += 1
-        
     if agreement == 3:
-    confidence = "🔥 HIGH"
-    recommendation = "✅ LONG дозволений"
+        confidence = "🔥 HIGH"
+        recommendation = "✅ LONG дозволений"
+
     elif agreement == 2:
-    confidence = "⚡ MEDIUM"
-    recommendation = "⚠️ Вхід можливий з підтвердженням"
+        confidence = "⚡ MEDIUM"
+        recommendation = "⚠️ Вхід можливий з підтвердженням"
+
     elif agreement == 1:
-    confidence = "⚠️ LOW"
-    recommendation = "⏳ Краще зачекати"
+        confidence = "⚠️ LOW"
+        recommendation = "⏳ Краще зачекати"
+
     else:
-    confidence = "❌ NONE"
-    recommendation = "🚫 Торгівля не рекомендується"
+        confidence = "❌ NONE"
+        recommendation = "🚫 Торгівля не рекомендується"
 
-message = (
-    f"📊 Trade Pilot AI MTF\n\n"
-    f"{symbol}\n\n"
-    f"15m → {result['15m']['signal']} ⭐{result['15m']['score']}/4\n"
-    f"1h → {result['1h']['signal']} ⭐{result['1h']['score']}/4\n"
-    f"4h → {result['4h']['signal']} ⭐{result['4h']['score']}/4\n\n"
-    f"━━━━━━━━━━━━━━━\n"
-    f"📈 Узгодження: {agreement}/3\n"
-    f"🎯 Confidence: {confidence}\n\n"
-    f"{recommendation}"
-)
+    message = (
+        f"📊 Trade Pilot AI MTF\n\n"
+        f"{symbol}\n\n"
+        f"15m → {result['15m']['signal']} ⭐{result['15m']['score']}/4\n"
+        f"1h → {result['1h']['signal']} ⭐{result['1h']['score']}/4\n"
+        f"4h → {result['4h']['signal']} ⭐{result['4h']['score']}/4\n\n"
+        f"━━━━━━━━━━━━━━━\n"
+        f"📈 Узгодження: {agreement}/3\n"
+        f"🎯 Confidence: {confidence}\n\n"
+        f"{recommendation}"
+    )
 
-await update.message.reply_text(message)
+    await update.message.reply_text(message)
+
+
 def main():
     Thread(target=run_web, daemon=True).start()
 
@@ -241,11 +233,16 @@ def main():
     app.add_handler(CommandHandler("signal", signal))
     app.add_handler(CommandHandler("menu", menu))
     app.add_handler(CommandHandler("mtf", mtf))
-    app.add_handler(CallbackQueryHandler(button))
+
+    app.add_handler(
+        CallbackQueryHandler(button)
+    )
 
     print("🚀 Trade Pilot AI v1.1 запущено")
 
-    app.run_polling(drop_pending_updates=True)
+    app.run_polling(
+        drop_pending_updates=True
+    )
 
 
 if __name__ == "__main__":
