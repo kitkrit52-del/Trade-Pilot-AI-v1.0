@@ -179,7 +179,34 @@ async def signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"❌ Помилка аналізу:\n{str(e)}"
         )
 
+async def mtf(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    symbol = "BTCUSDT"
 
+    if len(context.args) >= 1:
+        symbol = context.args[0].upper()
+
+    result = get_mtf_signal(symbol)
+
+    agreement = 0
+
+    for tf in result:
+        if result[tf]["signal"] == "🟢 LONG":
+            agreement += 1
+
+    message = (
+        f"📊 Trade Pilot AI MTF\n\n"
+        f"{symbol}\n\n"
+        f"15m → {result['15m']['signal']} "
+        f"⭐{result['15m']['score']}/4\n"
+        f"1h → {result['1h']['signal']} "
+        f"⭐{result['1h']['score']}/4\n"
+        f"4h → {result['4h']['signal']} "
+        f"⭐{result['4h']['score']}/4\n\n"
+        f"━━━━━━━━━━━━━━━\n"
+        f"📈 Узгодження: {agreement}/3"
+    )
+
+    await update.message.reply_text(message)
 def main():
     Thread(target=run_web, daemon=True).start()
 
