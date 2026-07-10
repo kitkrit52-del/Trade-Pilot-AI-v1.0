@@ -209,7 +209,18 @@ async def mtf(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"4h → {result['4h']['signal']} "
         f"⭐{result['4h']['score']}/4\n\n"
         f"━━━━━━━━━━━━━━━\n"
-        f"📈 Узгодження: {agreement}/3"
+       if agreement == 3:
+    confidence = "🔥 HIGH"
+    recommendation = "✅ LONG дозволений"
+elif agreement == 2:
+    confidence = "⚡ MEDIUM"
+    recommendation = "⚠️ Вхід можливий з підтвердженням"
+elif agreement == 1:
+    confidence = "⚠️ LOW"
+    recommendation = "⏳ Краще зачекати"
+else:
+    confidence = "❌ NONE"
+    recommendation = "🚫 Торгівля не рекомендується"
     )
 
     await update.message.reply_text(message)
