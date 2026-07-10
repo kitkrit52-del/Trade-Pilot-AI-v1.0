@@ -7,20 +7,7 @@ def get_signal(symbol="BTCUSDT", timeframe="1h"):
     exchange = ccxt.binance({
         "enableRateLimit": True
     })
-def get_mtf_signal(symbol="BTCUSDT"):
-    timeframes = ["15m", "1h", "4h"]
 
-    results = {}
-
-    for tf in timeframes:
-        data = get_signal(symbol, tf)
-
-        results[tf] = {
-            "signal": data["signal"],
-            "score": data["score"]
-        }
-
-    return results
     pair = symbol.replace("USDT", "/USDT")
 
     candles = exchange.fetch_ohlcv(
@@ -140,3 +127,19 @@ def get_mtf_signal(symbol="BTCUSDT"):
         "tp1": tp1,
         "tp2": tp2
     }
+
+
+def get_mtf_signal(symbol="BTCUSDT"):
+    timeframes = ["15m", "1h", "4h"]
+
+    results = {}
+
+    for tf in timeframes:
+        data = get_signal(symbol, tf)
+
+        results[tf] = {
+            "signal": data["signal"],
+            "score": data["score"]
+        }
+
+    return results
