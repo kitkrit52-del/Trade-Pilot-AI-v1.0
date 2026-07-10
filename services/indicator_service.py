@@ -41,20 +41,23 @@ def get_signal(symbol="BTCUSDT", timeframe="1h"):
 
     # RSI
     df["RSI"] = ta.momentum.rsi(
-        df["close"],
-        window=14
-    )
-macd = ta.trend.MACD(df["close"])
+    df["close"],
+    window=14
+)
 
-df["MACD"] = macd.macd()
-df["MACD_SIGNAL"] = macd.macd_signal()
+     # MACD
+     macd = ta.trend.MACD(df["close"])
+
+    df["MACD"] = macd.macd()
+    df["MACD_SIGNAL"] = macd.macd_signal()
+
     # ATR
     atr_indicator = ta.volatility.AverageTrueRange(
-        high=df["high"],
-        low=df["low"],
-        close=df["close"],
-        window=14
-    )
+    high=df["high"],
+    low=df["low"],
+    close=df["close"],
+    window=14
+)
 
     df["ATR"] = atr_indicator.average_true_range()
 
