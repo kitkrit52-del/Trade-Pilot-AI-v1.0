@@ -138,3 +138,114 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Version: 1.2 Stable\n"
         "Hosting: Zeabur"
     )
+
+
+# ==========================
+# MENU
+# ==========================
+
+async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    logger.info("/menu")
+
+    keyboard = [
+        [
+            InlineKeyboardButton("₿ BTC", callback_data="BTCUSDT"),
+            InlineKeyboardButton("Ξ ETH", callback_data="ETHUSDT")
+        ],
+        [
+            InlineKeyboardButton("◎ SOL", callback_data="SOLUSDT"),
+            InlineKeyboardButton("✕ XRP", callback_data="XRPUSDT")
+        ]
+    ]
+
+    await update.message.reply_text(
+        "📊 Оберіть актив:",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+
+# ==========================
+# CALLBACK BUTTONS
+# ==========================
+
+async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    query = update.callback_query
+
+    await query.answer()
+
+    callback = query.data
+
+    logger.info(f"BUTTON -> {callback}")
+
+    try:
+
+        # -----------------------
+        # STEP 1
+        # -----------------------
+
+        if "|" not in callback:
+
+            symbol = callback
+
+            keyboard = [
+                [
+                    InlineKeyboardButton(
+                        "15m",
+                        callback_data=f"{symbol}|15m"
+                    ),
+                    InlineKeyboardButton(
+                        "1H",
+                        callback_data=f"{symbol}|1h"
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        "4H",
+                        callback_data=f"{symbol}|4h"
+                    ),
+                    InlineKeyboardButton(
+                        "1D",
+                        callback_data=f"{symbol}|1d"
+                    )
+                ]
+            ]
+
+            await query.edit_message_text(
+                text=f"⏰ Оберіть таймфрейм для {symbol}",
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
+
+            return
+
+        # -----------------------
+        # STEP 2
+        # -----------------------
+
+        symbol, timeframe = callback.split("|")
+
+        logger.info(
+            f"ANALYSIS {symbol} {timeframe}"
+        )
+
+        signal_data = get_signal(
+            symbol,
+            timeframe
+        )
+
+        message = build_signal_message(
+            signal_data
+        )
+
+        await query.edit_message_text(
+            message
+        )
+
+    except Exception as e:
+
+        logger.exception(e)
+
+        await query.edit_message_text(
+            f"❌ Помилка аналізу\n\n{e}"
+        )
