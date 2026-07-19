@@ -249,3 +249,185 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(
             f"❌ Помилка аналізу\n\n{e}"
         )
+
+
+# ==========================
+# SIGNAL
+# ==========================
+
+async def signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    logger.info("/signal")
+
+    try:
+
+        symbol = "BTCUSDT"
+        timeframe = "1h"
+
+        if len(context.args) >= 1:
+            symbol = context.args[0].upper()
+
+        if len(context.args) >= 2:
+            timeframe = context.args[1]
+
+        signal_data = get_signal(
+            symbol,
+            timeframe
+        )
+
+        await update.message.reply_text(
+            build_signal_message(signal_data)
+        )
+
+    except Exception as e:
+
+        logger.exception(e)
+
+        await update.message.reply_text(
+            f"❌ Помилка:\n{e}"
+        )
+
+
+# ==========================
+# MULTI TIMEFRAME
+# ==========================
+
+async def mtf(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    logger.info("/mtf")
+
+    try:
+
+        symbol = "BTCUSDT"
+
+        if len(context.args) >= 1:
+            symbol = context.args[0].upper()
+
+        result = get_mtf_signal(symbol)
+
+        agreement = sum(
+            1
+            for tf in result
+            if result[tf]["signal"] == "🟢 LONG"
+        )
+
+        if agreement == 3:
+            confidence = "🔥 HIGH"
+            recommendation = "✅ LONG дозволений"
+
+        elif agreement == 2:
+            confidence = "⚡ MEDIUM"
+            recommendation = "⚠️ Вхід можливий"
+
+        elif agreement == 1:
+            confidence = "🟡 LOW"
+            recommendation = "⏳ Краще зачекати"
+
+        else:
+            confidence = "🔴 NONE"
+            recommendation = "🚫 Торгівля не рекомендується"
+
+        message = (
+            f"📊 Trade Pilot AI MTF\n\n"
+
+            f"🪙 {symbol}\n\n"
+
+            f"15m → {result['15m']['signal']} ⭐{result['15m']['score']}/5\n"
+            f"1h  → {result['1h']['signal']} ⭐{result['1h']['score']}/5\n"
+            f"4h  → {result['4h']['signal']} ⭐{result['4h']['score']}/5\n\n"
+
+            f"━━━━━━━━━━━━━━━\n"
+
+            f"📈 Agreement : {agreement}/3\n"
+            f"🎯 Confidence : {confidence}\n\n"
+
+            f"{recommendation}"
+        )
+
+        await update.message.reply_text(
+            message
+        )
+
+    except Exception as e:
+
+        logger.exception(e)
+
+        await update.message.reply_text(
+            f"❌ Помилка:\n{e}"
+        )
+
+
+# ==========================
+# MAIN
+# ==========================
+
+def main():
+
+    logger.info(
+        "Trade Pilot AI стартує..."
+    )
+
+    Thread(
+        target=run_web,
+        daemon=True
+    ).start()
+
+    app = (
+        Application
+        .builder()
+        .token(BOT_TOKEN)
+        .build()
+    )
+
+    app.add_handler(
+        CommandHandler(
+            "start",
+            start
+        )
+    )
+
+    app.add_handler(
+        CommandHandler(
+            "status",
+            status
+        )
+    )
+
+    app.add_handler(
+        CommandHandler(
+            "menu",
+            menu
+        )
+    )
+
+    app.add_handler(
+        CommandHandler(
+            "signal",
+            signal
+        )
+    )
+
+    app.add_handler(
+        CommandHandler(
+            "mtf",
+            mtf
+        )
+    )
+
+    app.add_handler(
+        CallbackQueryHandler(
+            button
+        )
+    )
+
+    logger.info(
+        "✅ Trade Pilot AI v1.2 Stable ONLINE"
+    )
+
+    app.run_polling(
+        drop_pending_updates=True
+    )
+
+
+if __name__ == "__main__":
+    main()
